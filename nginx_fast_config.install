@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file   nginx_fast_config.install
+ * @author António P. P. Almeida <appa@perusio.net>
+ * @date   Sat Jun 18 18:59:15 2011
+ * 
+ * @brief  Install file for the nginx_fast_config module.
+ * 
+ * 
+ */
+
+/** 
+ * Implements hook_install(). 
+ *
+ */
+function nginx_fast_config_install() {
+  // Alter the module weight to make sure we come after globalredirect.
+  db_query(
+    "UPDATE {system} SET weight = '%d' WHERE name = 'nginx_fast_config'",
+    db_result(
+      db_query("SELECT weight from {system} WHERE name = 'globalredirect'")) + 1);  
+} // nginx_fast_config_install
+
+
+/**
+ * Implements hook_requirements().
+ */
+function nginx_fast_config_requirements($phase) {
+  
+  $requirements = array();
+  // Ensure translations don't break at install time.
+  $t = get_t();
+  // The link to the configuration.
+  $nginx_fast_config_link = l($t('Nginx configuration'),
+                              'https://github.com/perusio/drupal-with-nginx');
+  
+  // Check that the Nginx fast config is possible.
+  if ($phase == 'runtime') {
+    // First check to see if Nginx is installed. If not signal it in the
+    // status page.
+    if (stripos($_SERVER['SERVER_SOFTWARE'], 'nginx') === FALSE) {
+      $description = l('Nginx', 'http://nginx.org');
+      $value = $t('not installed');
+      $severity = REQUIREMENT_WARNING;
+    }
+    else {
+      // Signal the fact that the deslashing is disabled on globalredirect.
+      if (module_exists('globalredirect') && function_exists('_globalredirect_get_settings')) {
+        // This is ugly, but the globalredirect module saves the settings as an
+        // array. That's the source of the ugliness.
+        $gr_settings = _globalredirect_get_settings();
+        // If deslash is off then signal it.
+        if (empty($gr_settings['deslash'])) {
+          $value = $t('Safe');
+          $severity = REQUIREMENT_OK;
+        }
+        else {
+          $value = $t('Unsafe');
+          $severity = REQUIREMENT_WARNING;      
+        }
+      } // globalredirect  
+    } // nginx enabled
+  } // runtime
+
+  // Return the requirements array.
+  return array(
+    'nginx_fast_config' => array('title' => $t('Nginx fast configuration capacity status'),
+                                 'description' => $t("It's safe to run the 0 rewrites $nginx_fast_config_link."),
+                                 'value' => $value,
+                                 'severity' => $severity)); 
+} // nginx_fast_config_requirements

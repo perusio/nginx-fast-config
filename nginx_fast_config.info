@@ -1,0 +1,12 @@
+name = Nginx Fast Config
+description = Fixes any setting of a particular module that causes problems with a 0 rewrites Nginx config.
+package = Nginx
+dependencies[] = globalredirect
+version = 6.x-1.0
+core = 6.x
+php = 5.2
+
+;;; Local Variables:
+;;; mode: conf
+;;; coding: utf-8
+;;; End:

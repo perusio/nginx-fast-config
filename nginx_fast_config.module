@@ -1,0 +1,48 @@
+<?php
+/**
+ * @file   nginx_fast_config.module
+ * @author António P. P. Almeida <appa@perusio.net>
+ * @date   Sat Jun 18 18:59:15 2011
+ * 
+ * @brief  Fixes a drupal 6 installation for using a 0 rewrites Nginx config.
+ * 
+ * 
+ */
+
+/**
+ * Implements hook_help().
+ */
+function nginx_fast_config_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#nginx_fast_config':
+      return t('Fixes the settings of your Drupal installation for using a fast <strong>zero rewrites</strong>  ') . l(t('Nginx configuration'), 'https://github.com/perusio/drupal-with-nginx') . '.';
+  }
+} // nginx_fast_config_help
+
+
+/**
+ * Implements hook_form_alter().
+ */
+function nginx_fast_config_form_globalredirect_settings_alter(&$form, &$form_state) {
+  // Hide the deslash setting from the user.
+  $form['settings']['deslash']['#access'] = FALSE;
+} // nginx_fast_config_form_alter
+
+/** 
+ * Implements hook_init()
+ * 
+ */
+function nginx_fast_config_init() {
+  
+  // Fix the global redirect deslash setting.
+  if (module_exists('globalredirect') && function_exists('_globalredirect_get_settings')) {
+    // Get the current settings.
+    $gr_settings = _globalredirect_get_settings();
+    // Unset the deslash if set.
+    if ($gr_settings['deslash']) {
+      $gr_settings['deslash'] = 0;
+      // Save the new settings.
+      variable_set('globalredirect_settings', $gr_settings);
+    } // deslash
+  } // globalredirect
+} // nginx_fast_config_fixes
