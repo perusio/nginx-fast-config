@@ -28,7 +28,6 @@ function nginx_fast_config_install() {
  */
 function nginx_fast_config_requirements($phase) {
   
-  $requirements = array();
   // Ensure translations don't break at install time.
   $t = get_t();
   // The link to the configuration.
