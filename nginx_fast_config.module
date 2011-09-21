@@ -3,10 +3,10 @@
  * @file   nginx_fast_config.module
  * @author António P. P. Almeida <appa@perusio.net>
  * @date   Sat Jun 18 18:59:15 2011
- * 
+ *
  * @brief  Fixes a drupal 6 installation for using a 0 rewrites Nginx config.
- * 
- * 
+ *
+ *
  */
 
 /**
@@ -28,12 +28,12 @@ function nginx_fast_config_form_globalredirect_settings_alter(&$form, &$form_sta
   $form['settings']['deslash']['#access'] = FALSE;
 } // nginx_fast_config_form_alter
 
-/** 
- * Implements hook_init()
- * 
+/**
+ * Implements hook_init().
+ *
  */
 function nginx_fast_config_init() {
-  
+
   // Fix the global redirect deslash setting.
   if (module_exists('globalredirect') && function_exists('_globalredirect_get_settings')) {
     // Get the current settings.
